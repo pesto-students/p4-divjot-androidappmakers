@@ -47,7 +47,19 @@ HTML definition is in a DTD(Document Type Definition) format.The output tree (th
 The root of the tree is the "Document" object.
 The DOM has an almost one-to-one relation to the markup.
 
-![HTML Code](/images/htmlCode.png)
+<!-- ![HTML Code](/images/htmlCode.png) -->
+
+```
+<html>
+  <body>
+    <p>
+      Hello World
+    </p>
+    <div> <img src="example.png"/></div>
+  </body>
+</html>
+
+```
 
 This markup would be translated to the following DOM tree:
 
@@ -89,9 +101,39 @@ If we find partial definitions we go up the tree until the struct is filled.
 If we didn't find any definitions for our struct then, in case the struct is an "inherited" type, we point to the struct of our parent in the context tree. In this case we also succeeded in sharing structs. If it's a reset struct then default values will be used.
 If the most specific node does add values then we need to do some extra calculations for transforming it to actual values. We then cache the result in the tree node so it can be used by children.
 
-![html Code](/images/htmlCode2.png)
+<!-- ![html Code](/images/htmlCode2.png) -->
 
-![CSS code](/images/cssCode.png)
+<!-- ![CSS code](/images/cssCode.png) -->
+
+##### HTML Code
+```
+
+<html>
+  <body>
+    <div class="err" id="div1">
+      <p>
+        this is a <span class="big"> big error </span>
+        this is also a
+        <span class="big"> very  big  error</span> error
+      </p>
+    </div>
+    <div class="err" id="div2">another error</div>
+  </body>
+</html>
+
+```
+##### CSS Code
+```
+
+div {margin: 5px; color:black}
+.err {color:red}
+.big {margin-top:3px}
+div span {margin-bottom:4px}
+#div1 {color:blue}
+#div2 {color:green}
+
+```
+
 
 ![The rule Tree](https://web-dev.imgix.net/image/T4FyVKpzu4WKF1kBNvXepbi08t52/zJM11a5O0t2C91bXl8wS.png?auto=format&w=1000)
 
