@@ -1,76 +1,116 @@
-const text=document.getElementById("text");
-const button=document.getElementById("button");
-
-if(button){
-    button.addEventListener("click",clickHandler);
-
-}
-
-const getNumber=()=>
-    new Promise((res,rej)=>{
-        const randomNumber=parseInt(Math.random()*100,10);
-        setTimeout(()=>{
-            if(randomNumber%5===0){
-                rej(`Rejected with num: ${randomNumber}`);
-            }
-            res(`Resolved with num: ${randomNumber}`);
-
-        },randomNumber*10);
-    });
-
-
-const clickHandler=()=>{
-    display("Loading...");
-    const numberPromise=getNumber();
-    numberPromise.then(display).catch(display);
-};
-
-const display=(content)=>{
-    text.innerText=content;
-}
-
-
-
-const CustomPromiseState= {
-    PENDING:"PENDING",
-    RESOLVED:"RESOLVED",
-    REJECTED:"REJECTED"
-}
-
-class CustomPromise {
-    constructor(fn){
-        this.CustomPromiseState=CustomPromiseState.PENDING;
-        this.resolver=this.resolver.bind(this);
-        this.rejector=this.rejector.bind(this);
-        this.thenFns=[];
-        this.catchFn=null;
-        this.resolvedData=null;
-        fn(this.resolver,this.rejector);
-    }
-
-    resolver(resolvedData) {
-        if(!this.CustomPromiseState === this.CustomPromiseState.PENDING) {
+const STATES = {
+    PENDING: "pending",
+    FULLFILLED: "fullfilled",
+    REJECTED: "rejected",
+  };
+  
+  function MyPromise(cb) {
+    this.value = undefined;
+    this.state = STATES.PENDING;
+    let thenCbs = [];
+    let catchCbs = [];
+    let runCallBacks = function () {
+      if (this.state === STATES.FULLFILLED) {
+        thenCbs.forEach((callback) => {
+          callback(this.value);
+        });
+        thenCbs = [];
+      }
+      if (this.state === STATES.REJECTED) {
+        catchCbs.forEach((callback) => {
+          callback(this.value);
+        });
+        catchCbs = [];
+      }
+    };
+    let onSuccess = function (value) {
+      if (this.state !== STATES.PENDING) return;
+      this.value = value;
+      this.state = STATES.FULLFILLED;
+      runCallBacks.bind(this)();
+    };
+    let onFail = function (value) {
+      if (this.state !== STATES.PENDING) return;
+      if (catchCbs.length === 0) {
+        throw new Error("Unhanled promise rejection error");
+      }
+      this.value = value;
+      this.state = STATES.REJECTED;
+      runCallBacks.bind(this)();
+    };
+    let bindedOnSuccess = onSuccess.bind(this);
+    let bindedOnFail = onFail.bind(this);
+  
+    this.then = function (thenCb, catchCb) {
+      return new MyPromise(function (resolve, reject) {
+        thenCbs.push((result) => {
+          if (!thenCb) {
+            resolve(result);
             return;
+          }
+          try {
+            resolve(thenCb(result));
+          } catch (error) {
+            reject(error);
+          }
+        });
+  
+        catchCbs.push((result) => {
+          if (!catchCb) {
+            reject(result);
+            return;
+          }
+          try {
+            resolve(catchCb(result));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    };
+  
+    this.catch = function (cb) {
+      return this.then(undefined, cb);
+    };
+    cb(bindedOnSuccess, bindedOnFail);
+  }
+  
+  const getNumber = () => {
+    const n = Math.floor(Math.random() * 10);
+    console.log(`number is - ${n}`);
+    const p = new MyPromise((resolve, reject) => {
+      setTimeout(() => {
+        if (n % 5 === 0) {
+          resolve("number is divisible by 5");
+        } else {
+          reject("number is not divisible by 5");
         }
-        this.CustomPromiseState=CustomPromiseState.RESOLVED;
-        while(this.thenFns.length){
-            const thenFn=this.thenFns.shift();
-            this.resolverData=thenFn(this.resolvedData||resolvedData);
-        
-        }
-    }
-    rejector(rejectedData){
-        if(this.CustomPromiseState===this.CustomPromiseState.PENDING){
-            this.catchFn && this.catchFn(rejectedData);
-        }
-        this.CustomPromiseState=this.CustomPromiseState.REJECTED;
-    }
-    then(thenFn){
-        this.thenFns.push(thenFn);
-        return this;
-    }
-    catch(catchFn){
-        this.catchFn=catchFn;
-        return this;
-    }
-}
+      }, 1000);
+    });
+  
+    p.then((v) => {
+      console.log("first callback");
+      console.log(v);
+      return 2;
+    })
+      .then((v) => {
+        console.log("second callback");
+        console.log(v);
+        return 3;
+      })
+      .then((v) => {
+        console.log("third callback");
+        console.log(v);
+        return 4;
+      })
+      .catch((err) => {
+        console.log(err);
+        return 23;
+      })
+      .then((val) => {
+        console.log("then after catch ");
+        console.log(val);
+      });
+  };
+  
+  getNumber();
