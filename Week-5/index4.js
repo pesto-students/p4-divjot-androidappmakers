@@ -19,7 +19,8 @@ const asyncOpzgenerator= async function* (){
     const areaT=yield a;
     const b=await circleArea(5);
     const areaC=yield b;
-    const c=await totalArea(areaC,areaT);
+    const c=await totalArea(a,b);
+    //console.log("c is" + c);
     return c;
   }
   catch(e) {
@@ -41,5 +42,16 @@ console.log(result);
 }
 
 
+async function asyncCall() {
+  console.log('async calling');
+  const result = await triangleArea(2,3);
+  console.log(result);
+  const result2 = await circleArea(5);
+  console.log(result2);
+  const result3 = await totalArea(result,result2);
+  console.log(result3);
+  // expected output: "resolved"
+}
 
+//asyncCall();
 usingGenerator();
