@@ -11,3 +11,7 @@ var maxSubArray = function(nums) {
 };
 
 console.log(maxSubArray([4,-1,2,1]));
+
+
+//time complexity- O(n);
+//space complexity=O(1)

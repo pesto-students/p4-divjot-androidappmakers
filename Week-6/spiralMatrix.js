@@ -40,3 +40,6 @@
 };
 
 console.log(spiralOrder([ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ] ] ));
+
+//time complexity- O(n*n*m);
+//space complexity=O(n*m)

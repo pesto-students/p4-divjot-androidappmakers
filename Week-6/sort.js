@@ -25,3 +25,6 @@
 };
 
 sortColors([0,2,1,2,0]);
+
+//time complexity- O(n);
+//space complexity=O(1)

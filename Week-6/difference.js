@@ -33,3 +33,6 @@ var findPair = function(nums, k) {
 
 
 console.log(findPair([5, 10, 3, 2, 50, 80],78));
+
+//time complexity- O(n);
+//space complexity=O(n)
